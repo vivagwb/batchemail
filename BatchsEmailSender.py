@@ -11,6 +11,8 @@ from email.utils import formataddr
 from email import encoders
 import msvcrt
 import time
+import pandas as pd
+
 
 # ========================批量发送邮件测试（二）----邮件内容固定，主题和附件变化=================================
 #
@@ -29,22 +31,15 @@ sender_name = u'xxx公司'
 # --------------根据输入的CSV文件，获取通讯录人名和相应的邮箱地址-------
 
 def getAddrBook(addrBook):
-	'''
-		@作用：根据输入的CSV文件，形成相应的通讯录字典
-		@返回：字典类型，name为人名，value为对应的邮件地址
-	'''
-	with open(addrBook,'r',encoding='gbk') as addrFile:
-		reader = csv.reader(addrFile)
-		name = []
-		value = []
-		for row in reader:
-			name.append(row[0])
-			value.append(row[1])
 
-	addrs = dict(zip(name, value))
+		#@作用：根据输入的CSV文件，形成相应的通讯录字典,同一个名称可以对应多个邮箱（适用多个收件人场景）
+
+	address=pd.read_csv(addrBook)  #注意收件人通讯录需保存为编码格式为utf-8的csv文件
+	addrs=address.groupy('name').email.apply(list).to_dict()   #注意收件人通讯录首列应命名为“name”，第二列应命名为“email”
+
 	return addrs
 
-# addrs = {name : value}
+
 
 # -------------------根据附件名称中获得的人名，查找通讯录，找到对应的邮件地址---------------
 
